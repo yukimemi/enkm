@@ -1,0 +1,60 @@
+[config]
+skip_core_tasks = true
+
+[tasks.format]
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt"]
+description = "Format code using rustfmt"
+
+[tasks.run]
+command = "cargo"
+args = ["run"]
+
+[tasks.clean]
+command = "cargo"
+args = ["clean"]
+
+[tasks.build]
+command = "cargo"
+args = ["build"]
+dependencies = ["format"]
+
+[tasks.rebuild]
+command = "cargo"
+args = ["build"]
+dependencies = ["clean"]
+
+[tasks.install]
+command = "cargo"
+args = ["install", "--force", "--path", "."]
+# dependencies = ["test"]
+
+[tasks.lint]
+command = "cargo"
+args = ["clippy"]
+
+[tasks.test]
+command = "cargo"
+args = ["test", "--", "--nocapture"]
+dependencies = ["format", "lint"]
+
+[tasks.debug]
+script = ["RUST_LOG=enkm=debug cargo run -- ${@}"]
+
+[tasks.watch]
+env = { "RUST_LOG" = "enkm=debug" }
+watch = { postpone = true, ignore_pattern = "dst/*" }
+dependencies = [
+  "build",
+  "test",
+]
+
+
+[tasks.default]
+dependencies = [
+  "format",
+  "build",
+  "test",
+]
+
